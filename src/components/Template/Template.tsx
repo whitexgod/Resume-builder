@@ -1,45 +1,38 @@
-import { useRef, useState } from "react";
-import Red from "../Buttons/Red";
+import { useEffect, useRef, useState } from "react";
 import Achievements from "./Sections/Achievements/Achievements";
-import Education from "./Sections/Education/Education";
+import Educations from "./Sections/Education/Educations";
 import Heading from "./Sections/Heading/Heading";
 import Objective from "./Sections/Objective/Objective";
 import Projects from "./Sections/Projects/Projects";
 import Skills from "./Sections/Skills/Skills";
 import WorkExperience from "./Sections/WorkExperience/WorkExperience";
-import Green from "../Buttons/Green";
-import { LocalStorage } from "../../lib/enum/localStorage.enum";
 import { handleTemplateDownload } from "../../lib/helper/handleTemplateDownload";
+import ActionBar from "./ActionBar/ActionBar";
+import { LocalStorage } from "../../lib/enum/localStorage.enum";
 
 const Template = () => {
-  const [candidateName, setCandidateName] = useState("resume");
+  const [candidateName, setCandidateName] = useState("Your Name");
   const templateRef = useRef<HTMLDivElement>(null);
+  const headingRef = useRef<HTMLDivElement>(null);
   const objectiveRef = useRef<HTMLDivElement>(null);
+  const skillsRef = useRef<HTMLDivElement>(null);
+  const educationRef = useRef<HTMLDivElement>(null);
+  const workExperiencesRef = useRef<HTMLDivElement>(null);
+  const projectsRef = useRef<HTMLDivElement>(null);
 
   const updateCandidateName = (name: string) => {
     setCandidateName(name);
   };
 
-  const onClear = () => {
-    localStorage.clear();
-  };
-
-  const handleSaveObjective = () => {
-    if (objectiveRef.current) {
-      const content = objectiveRef.current.innerHTML;
-      if (content) {
-        localStorage.setItem(LocalStorage.OBJECTIVE, content);
-        console.log("Objective saved:", content);
-      }
+  useEffect(() => {
+    const savedObjective = localStorage.getItem(LocalStorage.TEMPLATE);
+    if (savedObjective && templateRef.current) {
+      templateRef.current.innerHTML = savedObjective; // Set saved content
     }
-  };
-
-  const handleClearObjective = () => {
-    localStorage.removeItem(LocalStorage.OBJECTIVE);
-  };
+  }, [templateRef]);
 
   return (
-    <div className="flex flex-col justify-center items-center mb-10">
+    <div className="flex flex-col justify-center items-center mb-10 overflow-auto">
       <p className="text-2xl font-bold p-2">Template 1</p>
       <button
         onClick={async () => {
@@ -58,29 +51,37 @@ const Template = () => {
         >
           <div className="flex flex-col gap-2">
             {/* heading */}
-            <Heading updateCandidateName={updateCandidateName} />
+            <Heading
+              headingRef={headingRef}
+              candidateName={candidateName}
+              updateCandidateName={updateCandidateName}
+            />
             {/* objective */}
             <Objective objectiveRef={objectiveRef} />
             {/* skills */}
-            <Skills />
+            <Skills skillsRef={skillsRef} />
             {/* education */}
-            <Education />
+            <Educations educationRef={educationRef} />
             {/* Work Experience */}
-            <WorkExperience />
+            <WorkExperience workExperiencesRef={workExperiencesRef} />
             {/* Projects */}
-            <Projects />
+            <Projects projectsRef={projectsRef} />
             {/* Achievements */}
             <Achievements />
           </div>
         </div>
-        <div className="w-fit h-[297mm] bg-white shadow-md border border-gray-300 pl-2 py-4 flex flex-col gap-2">
-          <div className="flex justify-center">
-            <Red onRed={onClear} text="Clear All" />
-          </div>
-          <div className="flex gap-2">
-            <Green text="Save Objective" onGreen={handleSaveObjective} />
-            <Red onRed={handleClearObjective} text="Clear Objective" />
-          </div>
+        <div className="w-fit h-fit bg-white shadow-md border border-gray-300 pl-2 py-4 flex flex-col gap-2">
+          <p className="text-2xl font-semibold text-center">Tools</p>
+          <hr />
+          <ActionBar
+            templateRef={templateRef}
+            headingRef={headingRef}
+            objectiveRef={objectiveRef}
+            skillsRef={skillsRef}
+            educationRef={educationRef}
+            workExperiencesRef={workExperiencesRef}
+            projectsRef={projectsRef}
+          />
         </div>
       </div>
     </div>
